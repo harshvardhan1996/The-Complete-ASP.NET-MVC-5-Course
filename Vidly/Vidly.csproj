@@ -206,6 +206,18 @@
     <Compile Include="Migrations\201712121211103_SetNameOfMembershipTypes1.Designer.cs">
       <DependentUpon>201712121211103_SetNameOfMembershipTypes1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712130113409_DropBirthdate.cs" />
+    <Compile Include="Migrations\201712130113409_DropBirthdate.Designer.cs">
+      <DependentUpon>201712130113409_DropBirthdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130114460_AddBirthdateToCustomer.cs" />
+    <Compile Include="Migrations\201712130114460_AddBirthdateToCustomer.Designer.cs">
+      <DependentUpon>201712130114460_AddBirthdateToCustomer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130124429_SetBirthdateOfAubrey.cs" />
+    <Compile Include="Migrations\201712130124429_SetBirthdateOfAubrey.Designer.cs">
+      <DependentUpon>201712130124429_SetBirthdateOfAubrey.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Customer.cs" />
@@ -327,6 +339,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712121211103_SetNameOfMembershipTypes1.resx">
       <DependentUpon>201712121211103_SetNameOfMembershipTypes1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130113409_DropBirthdate.resx">
+      <DependentUpon>201712130113409_DropBirthdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130114460_AddBirthdateToCustomer.resx">
+      <DependentUpon>201712130114460_AddBirthdateToCustomer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130124429_SetBirthdateOfAubrey.resx">
+      <DependentUpon>201712130124429_SetBirthdateOfAubrey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
