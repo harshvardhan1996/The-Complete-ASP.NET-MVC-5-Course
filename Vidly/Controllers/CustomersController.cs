@@ -45,7 +45,7 @@ namespace Vidly.Controllers
                     Customer = customer,
                     MembershipTypes = _context.MembershipTypes.ToList()
                 };
-                return View("CustomerForm");
+                return View("CustomerForm", viewModel);
             }
 
             if (customer.Id == 0)
