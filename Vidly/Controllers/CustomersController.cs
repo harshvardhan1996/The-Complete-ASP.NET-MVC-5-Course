@@ -36,6 +36,7 @@ namespace Vidly.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save(Customer customer)
         {
             if (!ModelState.IsValid)
@@ -62,7 +63,8 @@ namespace Vidly.Controllers
             
             _context.SaveChanges();
 
-            return RedirectToAction("Index", "Customers");
+            var customers = _context.Customers.Include(c => c.MembershipType).ToList();
+            return View("Index", customers);
         }
 
         public ViewResult Index()
