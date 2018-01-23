@@ -38,20 +38,22 @@ namespace Vidly.Controllers.API
 
         //POST /api/customers
         [HttpPost]
-        public CustomerDto CreateCustomer(CustomerDto customerDto)
+        public IHttpActionResult CreateCustomer(CustomerDto customerDto)
         {
-            if (!ModelState.IsValid)
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
-
             try
             {
-                // Your code...
-                // Could also be before try if you know the exception occurs in SaveChanges
+                if (!ModelState.IsValid)
+                    return BadRequest();
+
                 var customer = Mapper.Map<CustomerDto, Customer>(customerDto);
                 _context.Customers.Add(customer);
                 _context.SaveChanges();
 
                 customerDto.Id = customer.Id;
+                return Created(new Uri(Request.RequestUri + "/" + customer.Id), customerDto);
+
+                _context.SaveChanges();
+
             }
             catch (DbEntityValidationException e)
             {
@@ -61,16 +63,12 @@ namespace Vidly.Controllers.API
                         eve.Entry.Entity.GetType().Name, eve.Entry.State);
                     foreach (var ve in eve.ValidationErrors)
                     {
-                        Console.WriteLine("- Property: \"{0}\", Value: \"{1}\", Error: \"{2}\"",
-                            ve.PropertyName,
-                            eve.Entry.CurrentValues.GetValue<object>(ve.PropertyName),
-                            ve.ErrorMessage);
+                        Console.WriteLine("- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage);
                     }
                 }
                 throw;
             }
-
-            return customerDto;
         }
 
         //PUT /api/customers/1
@@ -91,7 +89,7 @@ namespace Vidly.Controllers.API
 
         }
 
-    [HttpDelete]
+        [HttpDelete]
         public void DeleteCustomer(int Id)
         {
             var customerInDb = _context.Customers.SingleOrDefault(c => c.Id == Id);
