@@ -1,121 +1,81 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using System.Web.Http;
+using Vidly.Dtos;
 using Vidly.Models;
-using Vidly.ViewModels;
-using Vidly.Migrations;
 
-
-namespace Vidly.Controllers
+namespace Vidly.Controllers.Api
 {
-    public class MoviesController : Controller
+    public class MoviesController : ApiController
     {
         private ApplicationDbContext _context;
 
-        public MoviesController(){
-
+        public MoviesController()
+        {
             _context = new ApplicationDbContext();
         }
-    
-        protected override void Dispose(bool disposing)
+
+        public IEnumerable<MovieDto> GetMovies()
         {
- 	        _context.Dispose();
+            return _context.Movies.ToList().Select(Mapper.Map<Movie, MovieDto>);
         }
 
-
-        public ViewResult Index()
-        {
-            var movies = _context.Movies.Include(m => m.Genre).ToList();
-
-            return View(movies);
-        }
-        public ViewResult New()
-        {
-            var genres = _context.Genres.ToList();
-
-            var viewModel = new MovieFormViewModel
-            {
-                Genres = genres
-            };
-
-            return View("MovieForm", viewModel);
-        }
-
-        public ActionResult Edit(int id)
+        public IHttpActionResult GetMovie(int id)
         {
             var movie = _context.Movies.SingleOrDefault(c => c.Id == id);
 
             if (movie == null)
-                return HttpNotFound();
+                return NotFound();
 
-            var viewModel = new MovieFormViewModel(movie)
-            {
-                Genres = _context.Genres.ToList()
-            };
-
-            return View("MovieForm", viewModel);
+            return Ok(Mapper.Map<Movie, MovieDto>(movie));
         }
 
-        public ActionResult Details(int id)
+        [HttpPost]
+        public IHttpActionResult CreateMovie(MovieDto movieDto)
         {
-            var movie = _context.Movies.Include(m => m.Genre).SingleOrDefault(m => m.Id == id);
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-            if (movie == null)
-                return HttpNotFound();
+            var movie = Mapper.Map<MovieDto, Movie>(movieDto);
+            _context.Movies.Add(movie);
+            _context.SaveChanges();
 
-            return View(movie);
-
+            movieDto.Id = movie.Id;
+            return Created(new Uri(Request.RequestUri + "/" + movie.Id), movieDto);
         }
 
-        // GET: Movies/Random
-       public ActionResult Random()
+        [HttpPut]
+        public IHttpActionResult UpdateMovie(int id, MovieDto movieDto)
         {
-            var movie = new Movie() { Name = "Shrek!" };
-            var customers = new List<Customer>
-            {
-                new Customer { Name = "Customer 1" },
-                new Customer { Name = "Customer 2" }
-            };
+            if (!ModelState.IsValid)
+                return BadRequest();
 
-            var viewModel = new RandomMovieViewModel
-            {
-                Movie = movie,
-                Customers = customers
-            };
+            var movieInDb = _context.Movies.SingleOrDefault(c => c.Id == id);
 
-            return View(viewModel);
+            if (movieInDb == null)
+                return NotFound();
+
+            Mapper.Map(movieDto, movieInDb);
+
+            _context.SaveChanges();
+
+            return Ok();
         }
-       [HttpPost]
-       [ValidateAntiForgeryToken]
-       public ActionResult Save(Movie movie)
-       {
-           if (!ModelState.IsValid)
-           {
-               var viewModel = new MovieFormViewModel(movie)
-               {
-                   Genres = _context.Genres.ToList()
-               };
-           }
-           if (movie.Id == 0)
-           {
-               movie.DateAdded = DateTime.Now;
-               _context.Movies.Add(movie);
-           }
-           else
-           {
-               var movieInDb = _context.Movies.Single(m => m.Id == movie.Id);
-               movieInDb.Name = movie.Name;
-               movieInDb.GenreId = movie.GenreId;
-               movieInDb.NumberInStock = movie.NumberInStock;
-               movieInDb.ReleaseDate = movie.ReleaseDate;
-           }
 
-           _context.SaveChanges();
+        [HttpDelete]
+        public IHttpActionResult DeleteMovie(int id)
+        {
+            var movieInDb = _context.Movies.SingleOrDefault(c => c.Id == id);
 
-           return RedirectToAction("Index", "Movies");
-       }
+            if (movieInDb == null)
+                return NotFound();
+
+            _context.Movies.Remove(movieInDb);
+            _context.SaveChanges();
+
+            return Ok();
+        }
     }
 }
